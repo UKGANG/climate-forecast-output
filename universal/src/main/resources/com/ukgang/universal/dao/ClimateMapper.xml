@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ukgang.universal.dao.ClimateMapper">
+    <insert id="insertRecords">
+        INSERT INTO climate
+           (date, gps_location_id, humidity, is_ces, temp_min, temp_max, pressure)
+        SELECT A.* FROM (
+            <foreach item="climate" index="index" collection="climates" separator=" UNION ">
+               SELECT #{climate.date} AS date
+               , #{climate.location.id} AS gps_location_id
+               ,#{climate.humidity} AS humidity 
+               ,#{climate.isCelsius} AS is_ces
+               ,#{climate.tempMin} AS temp_min
+               ,#{climate.tempMax} AS temp_max
+               ,#{climate.pressure} AS pressure
+            </foreach>
+        ) A LEFT JOIN climate ce 
+            ON ce.date = A.date AND ce.gps_location_id = A.gps_location_id
+        WHERE ce.id IS NULL
+    </insert>
+
+    <insert id="insertGPSLocation" useGeneratedKeys="true">
+        INSERT INTO gps_location
+           (ref_id, country, city, lon, lat)
+        SELECT A.* FROM (
+            SELECT 
+                #{location.refId} AS refId
+                , #{location.country} AS country
+                , #{location.city} AS city
+                , #{location.longitude} AS lon
+                , #{location.latitude} AS lat
+        ) A WHERE NOT EXISTS (
+            SELECT 1 FROM gps_location g 
+            WHERE A.lon = g.lon 
+            AND A.lat = g.lat
+            UNION
+            SELECT 1 FROM gps_location g 
+            WHERE A.refId = g.ref_id 
+        )
+    </insert>
+
+	<update id="updateRecord">
+		UPDATE climate set
+		 humidity = #{climate.humidity}
+		 , is_ces = #{climate.isCelsius}
+		 , temp_min = #{climate.tempMin}
+		 , temp_max = #{climate.tempMax}
+		 , pressure = #{climate.pressure}
+        WHERE id = #{climate.id}
+	</update>
+
+    <select id="searchGPSLocationId" resultType="java.lang.Long">
+        SELECT id FROM gps_location c 
+        WHERE ref_id = #{location.refId}
+    </select>
+
+    <resultMap id="climateData" type="com.ukgang.universal.domain.Climate">
+        <id property="id" column="id"/>
+        <id property="date" column="date"/>
+        <id property="humidity" column="humidity"/>
+        <id property="tempMin" column="temp_min"/>
+        <id property="tempMax" column="temp_max"/>
+        <id property="pressure" column="pressure"/>
+        <association property="location" javaType="com.ukgang.universal.domain.GPSLocation" columnPrefix="l_">
+            <id property="id" column="id"/>
+            <id property="country" column="country"/>
+            <id property="city" column="city"/>
+            <id property="longitude" column="longitude"/>
+            <id property="latitude" column="latitude"/>
+        </association>
+    </resultMap>
+    <select id="getRecords" resultMap="climateData">
+        SELECT 
+	        	c.id
+	        	, c.date
+	        	, c.humidity
+	        	, c.temp_min
+	        	, c.temp_max
+	        	, c.pressure
+	        	, l.id AS l_id
+	        	, l.country AS l_country
+	        	, l.city AS l_city
+	        	, l.lon AS l_longitude
+	        	, l.lat AS l_latitude
+        FROM climate c 
+        JOIN gps_location l On c.gps_location_id = l.id 
+        WHERE c.date BETWEEN #{from} AND #{to}
+        <choose>
+	        <when test="location != null">
+	            AND l.lon = #{location.longitude}
+	            AND l.lat = #{location.latitude}
+	        </when>
+        </choose>
+        ORDER BY c.date ASC
+    </select>
+
+    <select id="getRecord" resultMap="climateData">
+        SELECT 
+	        	c.id
+	        	, c.date
+	        	, c.humidity
+	        	, c.temp_min
+	        	, c.temp_max
+	        	, c.pressure
+	        	, l.id AS l_id
+	        	, l.country AS l_country
+	        	, l.city AS l_city
+	        	, l.lon AS l_longitude
+	        	, l.lat AS l_latitude
+        FROM climate c 
+        JOIN gps_location l On c.gps_location_id = l.id 
+        WHERE c.date BETWEEN #{datetime} AND date_add(date_add(#{datetime}, interval 1 hour), interval -1 microsecond)
+        <choose>
+	        <when test="location != null">
+	            AND l.ref_id = #{location.refId}
+	        </when>
+        </choose>
+        ORDER BY c.date ASC
+    </select>
+
+    <select id="getAllRecords" resultMap="climateData">
+        SELECT 
+	        	c.id
+	        	, c.date
+	        	, c.humidity
+	        	, c.temp_min
+	        	, c.temp_max
+	        	, c.pressure
+	        	, l.id AS l_id
+	        	, l.country AS l_country
+	        	, l.city AS l_city
+	        	, l.lon AS l_longitude
+	        	, l.lat AS l_latitude
+        FROM climate c 
+        JOIN gps_location l On c.gps_location_id = l.id 
+    </select>
+</mapper>
