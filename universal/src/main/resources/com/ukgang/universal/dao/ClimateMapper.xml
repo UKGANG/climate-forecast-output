@@ -5,9 +5,9 @@
 
 <mapper namespace="com.ukgang.universal.dao.ClimateMapper">
     <insert id="insertRecords">
-        INSERT INTO climate
-           (date, gps_location_id, humidity, is_ces, temp_min, temp_max, pressure)
-        SELECT A.* FROM (
+        INSERT INTO climate (
+        		date, gps_location_id, humidity, is_ces, temp_min, temp_max, pressure
+        	) SELECT A.* FROM (
             <foreach item="climate" index="index" collection="climates" separator=" UNION ">
                SELECT #{climate.date} AS date
                , #{climate.location.id} AS gps_location_id
@@ -18,14 +18,15 @@
                ,#{climate.pressure} AS pressure
             </foreach>
         ) A LEFT JOIN climate ce 
-            ON ce.date = A.date AND ce.gps_location_id = A.gps_location_id
+            ON ce.date = A.date 
+            AND ce.gps_location_id = A.gps_location_id
         WHERE ce.id IS NULL
     </insert>
 
     <insert id="insertGPSLocation" useGeneratedKeys="true">
-        INSERT INTO gps_location
-           (ref_id, country, city, lon, lat)
-        SELECT A.* FROM (
+        INSERT INTO gps_location (
+        		ref_id, country, city, lon, lat
+        	) SELECT A.* FROM (
             SELECT 
                 #{location.refId} AS refId
                 , #{location.country} AS country
@@ -54,7 +55,8 @@
 
     <select id="searchGPSLocationId" resultType="java.lang.Long">
         SELECT id FROM gps_location c 
-        WHERE ref_id = #{location.refId}
+        WHERE c.lon = #{location.longitude}
+        AND c.lat = #{location.latitude}
     </select>
 
     <resultMap id="climateData" type="com.ukgang.universal.domain.Climate">
@@ -136,5 +138,9 @@
 	        	, l.lat AS l_latitude
         FROM climate c 
         JOIN gps_location l On c.gps_location_id = l.id 
+    </select>
+
+    <select id="getConfig" resultType="java.lang.String">
+        SELECT v FROM property WHERE k = #{key}
     </select>
 </mapper>

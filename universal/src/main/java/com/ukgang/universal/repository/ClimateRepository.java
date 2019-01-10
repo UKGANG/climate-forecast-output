@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.ukgang.universal.dao.ClimateMapper;
 import com.ukgang.universal.domain.Climate;
 import com.ukgang.universal.domain.GPSLocation;
+import com.ukgang.universal.startup.SystemMetadata.PropertyKey;
 
 @Component
 public class ClimateRepository {
@@ -47,5 +48,9 @@ public class ClimateRepository {
 
 	public List<Climate> getRecord(Date from, Date to, GPSLocation location) {
 		return mapper.getRecords(from, to, location);
+	}
+
+	public String getConfig(PropertyKey key) {
+		return mapper.getConfig(key);
 	}
 }

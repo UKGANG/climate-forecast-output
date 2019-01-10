@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 public class RestClient {
 
 	@Bean
-    public Client jerseyClient() throws Exception {
+    public Client jerseyClient() {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		cm.setDefaultMaxPerRoute(200);
 		cm.setMaxTotal(400);

@@ -53,7 +53,6 @@ public class ClimateApi {
 		List<WechatResponse.EstimationItem> items = result.stream()
 				.map(c -> {
 					double temp = (c.getTempMin() + c.getTempMax()) / 2 + 25;
-//					double temp = c.getTempMax();
 					double estimation = temp < 31.5 ? 660 : -0.44 * temp * temp + 18.1 * temp + 525;
 					WechatResponse.EstimationItem item = new WechatResponse.EstimationItem();
 					item.setDate(c.getDate());
