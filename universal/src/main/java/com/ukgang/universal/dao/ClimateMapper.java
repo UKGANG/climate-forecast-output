@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 
 import com.ukgang.universal.domain.Climate;
 import com.ukgang.universal.domain.GPSLocation;
-import com.ukgang.universal.startup.SystemMetadata.PropertyKey;
 
 @Mapper
 public interface ClimateMapper {
@@ -21,5 +20,5 @@ public interface ClimateMapper {
 	Climate getRecord(@Param("datetime") Date datetime, @Param("location") GPSLocation location);
 	List<Climate> getRecords(@Param("from") Date from, @Param("to") Date to, @Param("location") GPSLocation location);
 	List<Climate> getAllRecords();
-	String getConfig(@Param("key")PropertyKey key);
+	String getConfig(@Param("key")String key);
 }

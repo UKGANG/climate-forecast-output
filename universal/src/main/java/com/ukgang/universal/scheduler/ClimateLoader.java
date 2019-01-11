@@ -24,7 +24,7 @@ public class ClimateLoader {
 	OpenWeatherMapClient weatherAPIClient;
 
 	@Scheduled(cron = CRON_EVERY_DAY)
-	public void forcast() {
+	public void forecast() {
 		LOG.info("Start forcasting on {}", new Date());
 		climateService.forcasting();
 		LOG.info("Forcasting done {}", new Date());

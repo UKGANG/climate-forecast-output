@@ -34,7 +34,6 @@ bootRun {
     } else if (project.hasProperty("DS") ) {
         jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005'
     }
-    jvmArgs "-Dapp.version=${project.version}"
 }
 
 dependencies {

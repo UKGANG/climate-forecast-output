@@ -8,9 +8,9 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
 import com.ukgang.universal.client.ClimateDataSource;
 import com.ukgang.universal.domain.Climate;
-import com.ukgang.universal.domain.GPSLocation;
 import com.ukgang.universal.repository.ClimateRepository;
 
 @Component
@@ -31,8 +31,8 @@ public class ClimateService {
 		repository.repleteRecord(climate);
 	}
 
-	public List<String> getClimateRecord(Date from, Date to, GPSLocation location) {
-		return DataIntegrationService.calculate(repository.getRecord(from, to, location));
+	public List<String> getClimateRecordStr(Date from, Date to) {
+		return DataIntegrationService.calculate(Lists.newArrayList(extraResource.getWeather()));
 	}
 
 	public List<Climate> getClimateRecord(Date from, Date to) {

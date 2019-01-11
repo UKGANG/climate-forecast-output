@@ -51,6 +51,6 @@ public class ClimateRepository {
 	}
 
 	public String getConfig(PropertyKey key) {
-		return mapper.getConfig(key);
+		return mapper.getConfig(key.name());
 	}
 }

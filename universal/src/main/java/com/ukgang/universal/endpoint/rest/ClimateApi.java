@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 import com.ukgang.universal.domain.Climate;
-import com.ukgang.universal.domain.GPSLocation;
 import com.ukgang.universal.endpoint.rest.model.WechatResponse;
 import com.ukgang.universal.service.ClimateService;
 
@@ -28,17 +27,23 @@ public class ClimateApi {
 	@Autowired
 	private ClimateService climateService;
 
+	@GetMapping(path = "/forecast")
+	public void trigger1() {
+		climateService.forcasting();
+	}
+
+	@GetMapping(path = "/record")
+	public void trigger2() {
+		climateService.recording();
+	}
+
 	@GetMapping(path = "/test")
-	public String getRecords(@RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to, @RequestParam("lat") String lat,
-			@RequestParam("lon") String lon) {
-		GPSLocation location = new GPSLocation();
-		location.setLatitude(lat);
-		location.setLongitude(lon);
+	public String getRecordsTest(@RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
 		from = DateUtils.truncate(from, Calendar.MILLISECOND);
 		to = DateUtils.truncate(to, Calendar.MILLISECOND);
 		to = DateUtils.addDays(to, 1);
-		List<String> result = climateService.getClimateRecord(from, to, location);
+		List<String> result = climateService.getClimateRecordStr(from, to);
 		return Optional.ofNullable(result).orElseGet(Lists::newArrayList).stream()
 				.collect(Collectors.joining("<br><br>"));
 	}

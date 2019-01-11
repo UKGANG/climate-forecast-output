@@ -55,8 +55,8 @@
 
     <select id="searchGPSLocationId" resultType="java.lang.Long">
         SELECT id FROM gps_location c 
-        WHERE c.lon = #{location.longitude}
-        AND c.lat = #{location.latitude}
+        WHERE (c.lon = #{location.longitude} AND c.lat = #{location.latitude})
+        OR c.city = #{location.city}
     </select>
 
     <resultMap id="climateData" type="com.ukgang.universal.domain.Climate">
